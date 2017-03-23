@@ -11,7 +11,7 @@ PriorFlag = True  # If set to True MAP classifier will work, If not ML classifie
 ###################################### Functions Section ######################################
 
 ################################## Q2 ##################################
-def Mahalanobis(Mean, Cova, X):   # Calculate Mahalanobis distance for a Given X
+def Mahalanobis(Mean, Cova, X):   # Calculate Mahalanobis distance ^ 2 for a Given X
     a = X - Mean  # difference between X and Mean
     res = a.transpose() * numpy.linalg.inv(Cova) * a  # calculate Mahalanobis
     return res
@@ -57,7 +57,25 @@ def desVector(X, ClassW1, ClassW2, ClassW3):  # Decide for a vector of points
     return out
     pass
 
-
+def Drawing(xx1,xx2,zz,u): #Construct Matrix of results to be used in drawing 
+	Z1 = numpy.zeros((xx1.shape[0], xx1.shape[1]))
+	for i in range(xx1.shape[0]):
+		if u==1:
+			Z1[i, :] = desVector(numpy.c_[xx1[i, :], xx2[i, :], zz[i, :]].T,ClassW1, ClassW2, ClassW3)
+		elif u == 2:
+			Z1[i, :] = desVector(numpy.c_[xx1[i, :], zz[i, :], xx2[i, :]].T,ClassW1, ClassW2, ClassW3)
+		elif u == 3:
+			Z1[i, :] = desVector(numpy.c_[zz[i, :], xx1[i, :], xx2[i, :]].T,ClassW1, ClassW2, ClassW3)
+		pass
+	return Z1
+	pass	
+def InitArray(xx12):  #Initilize array of Ones 
+	zz = numpy.empty((xx12.shape[0], xx12.shape[1]))
+	for i in range(xx12.shape[0]):
+		for j in range(xx12.shape[1]):
+			zz[i, j] = 1
+	return zz		
+	pass
 ################################## Classes data ##########################################
 
 w1 = numpy.matrix([[-5.01, -5.43, 1.08, 0.86, -2.67, 4.94, -2.51, -2.25, 5.56, 1.03],
@@ -83,184 +101,95 @@ print("For Class w1 : \nMean = ")
 print(MeanM(w1))
 print("Covariance = ")
 print(CovM(w1))
-print("For Class w2 : \nMean = ")
+print("\nFor Class w2 : \nMean = ")
 print(MeanM(w2))
 print("Covariance = ")
 print(CovM(w2))
-print("For Class w3 : \nMean = ")
+print("\nFor Class w3 : \nMean = ")
 print(MeanM(w3))
 print("Covariance = ")
 print(CovM(w3))
+
 print("\nUsing MAP classifier:")
 print("P1 belongs to the class w"+str(des(numpy.matrix([[1], [2], [1]]), ClassW1, ClassW2, ClassW3)))
 print("P2 belongs to the class w"+str(des(numpy.matrix([[5], [3], [1]]), ClassW1, ClassW2, ClassW3)))
 print("P3 belongs to the class w"+str(des(numpy.matrix([[0], [0], [0]]), ClassW1, ClassW2, ClassW3)))
 print("P4 belongs to the class w"+str(des(numpy.matrix([[1], [0], [0]]), ClassW1, ClassW2, ClassW3)))
-PriorFlag = False
+
+PriorFlag = False  # Classifier is now ML classifier
+
 print("\nUsing ML classifier:")
 print("P1 belongs to the class w"+str(des(numpy.matrix([[1], [2], [1]]), ClassW1, ClassW2, ClassW3)))
 print("P2 belongs to the class w"+str(des(numpy.matrix([[5], [3], [1]]), ClassW1, ClassW2, ClassW3)))
 print("P3 belongs to the class w"+str(des(numpy.matrix([[0], [0], [0]]), ClassW1, ClassW2, ClassW3)))
 print("P4 belongs to the class w"+str(des(numpy.matrix([[1], [0], [0]]), ClassW1, ClassW2, ClassW3)))
-#PriorFlag = True
-'''
-x = numpy.matrix([[3], [5], [1]])
 
-print(Discrim(MeanM(w1), CovM(w1), x, 0.8))
-print(Discrim(MeanM(w2), CovM(w2), x, 0.1))
-print(Discrim(MeanM(w3), CovM(w3), x, 0.1))
-print(des(x, ClassW1, ClassW2, ClassW3))
-'''
-h = 0.2 # step used in meshgrid 
 
 ################################# Finding Min & Max for each feature ###################################
-x1_min = numpy.array([w1[0, :].min() - 1, w2[0, :].min() - 1, w2[0, :].min() - 1]).min()
-x1_max = numpy.array([w1[0, :].max() + 1, w2[0, :].max() + 1, w2[0, :].max() + 1]).max()
+x1_min = numpy.array([w1[0, :].min() - 1, w2[0, :].min() - 1, w3[0, :].min() - 1]).min()
+x1_max = numpy.array([w1[0, :].max() + 1, w2[0, :].max() + 1, w3[0, :].max() + 1]).max()
 
-x2_min = numpy.array([w1[1, :].min() - 1, w2[1, :].min() - 1, w2[1, :].min() - 1]).min()
-x2_max = numpy.array([w1[1, :].max() + 1, w2[1, :].max() + 1, w2[1, :].max() + 1]).max()
+x2_min = numpy.array([w1[1, :].min() - 1, w2[1, :].min() - 1, w3[1, :].min() - 1]).min()
+x2_max = numpy.array([w1[1, :].max() + 1, w2[1, :].max() + 1, w3[1, :].max() + 1]).max()
 
-x3_min = numpy.array([w1[2, :].min() - 1, w2[2, :].min() - 1, w2[2, :].min() - 1]).min()
-x3_max = numpy.array([w1[2, :].max() + 1, w2[2, :].max() + 1, w2[2, :].max() + 1]).max()
+x3_min = numpy.array([w1[2, :].min() - 1, w2[2, :].min() - 1, w3[2, :].min() - 1]).min()
+x3_max = numpy.array([w1[2, :].max() + 1, w2[2, :].max() + 1, w3[2, :].max() + 1]).max()
 
-
+h = 0.2 # step used in meshgrid 
 levels = [0.9, 1.1, 1.9, 2.1, 2.9, 3.1]
-fig, axes = plt.subplots(nrows=2, ncols=4)
 
-##############################Prepare Meshgrid################################################
+################################Drawing Using ML############################################
+fig, axes = plt.subplots(nrows=2, ncols=2)
+axes[1,1].axis('off')
+fig.canvas.set_window_title("ML")
+
+##############################X1 Vs X2################################################
 xx1, xx2 = numpy.meshgrid(numpy.arange(x1_min, x1_max, h), numpy.arange(x2_min, x2_max, h))
-
-############################Give any feature a constant value to Draw in 2D##################3
-zz = numpy.empty((xx1.shape[0], xx1.shape[1]))
-for i in range(xx1.shape[0]):
-    for j in range(xx1.shape[1]):
-        zz[i, j] = 1
-
-###########################Take Class dicision for each point and store results in Z################
-Z1 = numpy.zeros((xx1.shape[0], xx1.shape[1]))
-for i in range(xx1.shape[0]):
-    use = numpy.c_[xx1[i, :], xx2[i, :], zz[i, :]]
-    use = use.T
-    Z1[i, :] = desVector(use,ClassW1, ClassW2, ClassW3) 
-
-##############################Prepare Meshgrid################################################
-xx12, xx22 = numpy.meshgrid(numpy.arange(x1_min, x1_max, h), numpy.arange(x3_min, x3_max, h))
-
-############################Give any feature a constant value to Draw in 2D##################
-zz = numpy.empty((xx12.shape[0], xx12.shape[1]))
-for i in range(xx12.shape[0]):
-    for j in range(xx12.shape[1]):
-        zz[i, j] = 1
-
-###########################Take Class dicision for each point and store results in Z################
-Z12 = numpy.zeros((xx12.shape[0], xx12.shape[1]))
-for i in range(xx12.shape[0]):
-    use = numpy.c_[xx12[i, :], zz[i, :], xx22[i, :]]
-    use = use.T
-    Z12[i, :] = desVector(use,ClassW1, ClassW2, ClassW3)
-
-
-
-##############################Prepare Meshgrid################################################
-xx13, xx23 = numpy.meshgrid(numpy.arange(x2_min, x2_max, h), numpy.arange(x3_min, x3_max, h))
-
-############################Give any feature a constant value to Draw in 2D##################
-zz = numpy.empty((xx13.shape[0], xx13.shape[1]))
-for i in range(xx13.shape[0]):
-    for j in range(xx13.shape[1]):
-        zz[i, j] = 1
-
-###########################Take Class dicision for each point and store results in Z################
-Z13 = numpy.zeros((xx13.shape[0], xx13.shape[1]))
-for i in range(xx13.shape[0]):
-    use = numpy.c_[zz[i, :], xx13[i, :], xx23[i, :]]
-    use = use.T
-    Z13[i, :] = desVector(use,ClassW1, ClassW2, ClassW3)     
-
-axes[0,2].contourf(xx1, xx2, Z1, levels=levels, cmap=plt.cm.Paired)
-#plt.colorbar()
-#plt.show()
-axes[0,3].contourf(xx12, xx22, Z12, levels=levels, cmap=plt.cm.Paired)
-#plt.colorbar()
-#plt.show()
-axes[1,2].contourf(xx13, xx23, Z13, levels=levels, cmap=plt.cm.Paired)
-#plt.colorbar()
-
-PriorFlag = True
-
-##############################Prepare Meshgrid################################################
-xx1, xx2 = numpy.meshgrid(numpy.arange(x1_min, x1_max, h), numpy.arange(x2_min, x2_max, h))
-
-############################Give any feature a constant value to Draw in 2D##################3
-zz = numpy.empty((xx1.shape[0], xx1.shape[1]))
-for i in range(xx1.shape[0]):
-    for j in range(xx1.shape[1]):
-        zz[i, j] = 1
-
-###########################Take Class dicision for each point and store results in Z################
-Z1 = numpy.zeros((xx1.shape[0], xx1.shape[1]))
-for i in range(xx1.shape[0]):
-    use = numpy.c_[xx1[i, :], xx2[i, :], zz[i, :]]
-    use = use.T
-    Z1[i, :] = desVector(use,ClassW1, ClassW2, ClassW3) 
-
-##############################Prepare Meshgrid################################################
-xx12, xx22 = numpy.meshgrid(numpy.arange(x1_min, x1_max, h), numpy.arange(x3_min, x3_max, h))
-
-############################Give any feature a constant value to Draw in 2D##################
-zz = numpy.empty((xx12.shape[0], xx12.shape[1]))
-for i in range(xx12.shape[0]):
-    for j in range(xx12.shape[1]):
-        zz[i, j] = 1
-
-###########################Take Class dicision for each point and store results in Z################
-Z12 = numpy.zeros((xx12.shape[0], xx12.shape[1]))
-for i in range(xx12.shape[0]):
-    use = numpy.c_[xx12[i, :], zz[i, :], xx22[i, :]]
-    use = use.T
-    Z12[i, :] = desVector(use,ClassW1, ClassW2, ClassW3)
-
-
-
-##############################Prepare Meshgrid################################################
-xx13, xx23 = numpy.meshgrid(numpy.arange(x2_min, x2_max, h), numpy.arange(x3_min, x3_max, h))
-
-############################Give any feature a constant value to Draw in 2D##################
-zz = numpy.empty((xx13.shape[0], xx13.shape[1]))
-for i in range(xx13.shape[0]):
-    for j in range(xx13.shape[1]):
-        zz[i, j] = 1
-
-###########################Take Class dicision for each point and store results in Z################
-Z13 = numpy.zeros((xx13.shape[0], xx13.shape[1]))
-for i in range(xx13.shape[0]):
-    use = numpy.c_[zz[i, :], xx13[i, :], xx23[i, :]]
-    use = use.T
-    Z13[i, :] = desVector(use,ClassW1, ClassW2, ClassW3)     
-
+Z1 = Drawing(xx1,xx2,InitArray(xx1),1)
 axes[0,0].contourf(xx1, xx2, Z1, levels=levels, cmap=plt.cm.Paired)
-axes[0,0].set_title('Sharing x per column, y per row')
-#plt.colorbar()
-#plt.show()
+axes[0,0].set_xlabel('X1')
+axes[0,0].set_ylabel('X2')
+
+##############################X2 Vs X3################################################
+xx12, xx22 = numpy.meshgrid(numpy.arange(x1_min, x1_max, h), numpy.arange(x3_min, x3_max, h))
+Z12 = Drawing(xx12,xx22,InitArray(xx12),2)
 axes[0,1].contourf(xx12, xx22, Z12, levels=levels, cmap=plt.cm.Paired)
-#plt.colorbar()
-#plt.show()
+axes[0,1].set_xlabel('X2')
+axes[0,1].set_ylabel('X3')
+
+##############################X1 Vs X3################################################
+xx13, xx23 = numpy.meshgrid(numpy.arange(x2_min, x2_max, h), numpy.arange(x3_min, x3_max, h))
+Z13 = Drawing(xx13,xx23,InitArray(xx13),3)
 axes[1,0].contourf(xx13, xx23, Z13, levels=levels, cmap=plt.cm.Paired)
-#plt.colorbar()
+axes[1,0].set_xlabel('X1')
+axes[1,0].set_ylabel('X3')
+
+PriorFlag = True # Classifier is now MAP classifier
+
+################################Drawing Using MAP############################################
+fig1, axes1 = plt.subplots(nrows=2, ncols=2)
+axes1[1,1].axis('off')
+fig1.canvas.set_window_title("MAP")
+
+##############################X1 Vs X2################################################
+xx1, xx2 = numpy.meshgrid(numpy.arange(x1_min, x1_max, h), numpy.arange(x2_min, x2_max, h))
+Z1 = Drawing(xx1,xx2,InitArray(xx1),1)
+axes1[0,0].contourf(xx1, xx2, Z1, levels=levels, cmap=plt.cm.Paired)
+axes1[0,0].set_xlabel('X1')
+axes1[0,0].set_ylabel('X2')
+
+##############################X2 Vs X3################################################
+xx12, xx22 = numpy.meshgrid(numpy.arange(x1_min, x1_max, h), numpy.arange(x3_min, x3_max, h))
+Z12 = Drawing(xx12,xx22,InitArray(xx12),2)
+axes1[0,1].contourf(xx12, xx22, Z12, levels=levels, cmap=plt.cm.Paired)
+axes1[0,1].set_xlabel('X2')
+axes1[0,1].set_ylabel('X3')
+
+##############################X1 Vs X3################################################
+xx13, xx23 = numpy.meshgrid(numpy.arange(x2_min, x2_max, h), numpy.arange(x3_min, x3_max, h))
+Z13 = Drawing(xx13,xx23,InitArray(xx13),3)
+axes1[1,0].contourf(xx13, xx23, Z13, levels=levels, cmap=plt.cm.Paired)
+axes1[1,0].set_xlabel('X1')
+axes1[1,0].set_ylabel('X3')
+
 plt.show()
-
-
-
-
-'''
-Z1 = numpy.zeros((xx1.shape[0], xx1.shape[1]))
-for i in range(xx1.shape[0]):
-    use = numpy.c_[xx1[i, :], xx2[i, :], zz[i, :]]
-    use = use.T
-    Z1[i, :] = desVector(use,ClassW1, ClassW2, ClassW3)  
-
-levels = [0.9, 1.1, 1.9, 2.1, 2.9, 3.1]
-plt.contourf(xx1, xx2, Z1, levels=levels, cmap=plt.cm.Paired)
-plt.colorbar()
-plt.show()
-'''
